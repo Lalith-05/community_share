@@ -25,31 +25,37 @@ model User {
 
 model Category {
   id        String   @id @default(cuid())
-  name      String
+  name      String   @unique
   icon      String?
 
   items     Item[]
 }
 
 model Item {
-  id              String   @id @default(cuid())
-  title           String
-  description     String
-  imageUrls       String[]
-  availability    Boolean  @default(true)
-  depositAmount   Float
-  maxBorrowDays   Int
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  id            String   @id @default(cuid())
 
-  ownerId         String
-  owner           User @relation(fields: [ownerId], references: [id])
+  title         String
+  description   String
 
-  categoryId      String
-  category        Category @relation(fields: [categoryId], references: [id])
+  imageUrls     String[] @default([])
 
-  requests        BorrowRequest[]
-  reviews         Review[]
+  availability  Boolean  @default(true)
+
+  depositAmount Float?   // optional
+
+  maxBorrowDays Int
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  ownerId       String
+  owner         User @relation(fields: [ownerId], references: [id])
+
+  categoryId    String
+  category      Category @relation(fields: [categoryId], references: [id])
+
+  requests      BorrowRequest[]
+  reviews       Review[]
 }
 
 model BorrowRequest {
