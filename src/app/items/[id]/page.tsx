@@ -4,13 +4,32 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 
+
 export default function ItemDetailsPage() {
   const params = useParams();
   const id = params.id as string;
 
   const [item, setItem] = useState<any>(null);
+  const [startDate, setStartDate] = useState("");
+const [endDate, setEndDate] = useState("");
+const [message, setMessage] = useState("");
 
-  useEffect(() => {
+const handleBorrow = async () => {
+  try {
+    await axios.post("/api/borrow-requests", {
+      itemId: item.id,
+      startDate,
+      endDate,
+      message,
+    });
+
+    alert("Borrow request sent!");
+  } catch (error) {
+    console.error(error);
+    alert("Failed to send request");
+  }
+}; 
+useEffect(() => {
     if (!id) return;
 
     axios
@@ -48,12 +67,39 @@ export default function ItemDetailsPage() {
       <p className="mt-2">
         Max Borrow Days: {item.maxBorrowDays}
       </p>
-      <button
-  onClick={handleBorrow}
-  className="mt-6 bg-black text-white px-4 py-2 rounded"
->
-  Request Borrow
-</button>
+      <div className="mt-8 border-t pt-6">
+  <h2 className="text-2xl font-bold mb-4">
+    Request Borrow
+  </h2>
+
+  <input
+    type="date"
+    value={startDate}
+    onChange={(e) => setStartDate(e.target.value)}
+    className="w-full border p-3 rounded mb-3"
+  />
+
+  <input
+    type="date"
+    value={endDate}
+    onChange={(e) => setEndDate(e.target.value)}
+    className="w-full border p-3 rounded mb-3"
+  />
+
+  <textarea
+    placeholder="Message to owner"
+    value={message}
+    onChange={(e) => setMessage(e.target.value)}
+    className="w-full border p-3 rounded mb-3"
+  />
+
+  <button
+    onClick={handleBorrow}
+    className="bg-black text-white px-4 py-2 rounded"
+  >
+    Send Request
+  </button>
+</div>
     </main>
   );
 }
