@@ -53,6 +53,7 @@ export default function RequestsPage() {
 
             <p>
               Status: {request.status}
+            {request.status === "PENDING" && (  
               <div className="mt-4 flex gap-2">
   <button
     onClick={() =>
@@ -78,6 +79,7 @@ export default function RequestsPage() {
     Reject
   </button>
 </div>
+)}
             </p>
 
             <p>

@@ -22,6 +22,25 @@ export async function POST(req: Request) {
       message,
     } = body;
 
+    const item = await prisma.item.findUnique({
+  where: {
+    id: itemId,
+  },
+});
+
+if (!item) {
+  return NextResponse.json(
+    { error: "Item not found" },
+    { status: 404 }
+  );
+}
+
+if (item.ownerId === currentUser.id) {
+  return NextResponse.json(
+    { error: "You cannot borrow your own item" },
+    { status: 400 }
+  );
+}
     const request = await prisma.borrowRequest.create({
       data: {
         itemId,
