@@ -8,12 +8,13 @@ import { useEffect, useState } from "react";
 export default function BrowsePage() {
   const [items, setItems] = useState<any[]>([]);
   const [search, setSearch] = useState("");
+  const [category, setCategory] = useState("");
 
   useEffect(() => {
     axios
-      .get(`/api/items?search=${search}`)
+      .get(`/api/items?search=${search}&category=${category}`)
       .then((res) => setItems(res.data));
-  }, [search]);
+  }, [search, category]);
 
   return (
     <main className="p-10">
@@ -29,6 +30,47 @@ export default function BrowsePage() {
   }
   className="w-full border p-3 rounded mb-6"
 />
+
+<select
+  value={category}
+  onChange={(e) =>
+    setCategory(e.target.value)
+  }
+  className="w-full border p-3 rounded mb-6"
+>
+  <option value="">
+    All Categories
+  </option>
+
+  <option value="Tools">
+    Tools
+  </option>
+
+  <option value="Electronics">
+    Electronics
+  </option>
+
+  <option value="Sports">
+    Sports
+  </option>
+
+  <option value="Books">
+    Books
+  </option>
+
+  <option value="Kitchen">
+    Kitchen
+  </option>
+
+  <option value="Gaming">
+    Gaming
+  </option>
+
+  <option value="Other">
+    Other
+  </option>
+</select>
+
       <div className="grid md:grid-cols-2 gap-4">
         {items.map((item) => (
           <Link

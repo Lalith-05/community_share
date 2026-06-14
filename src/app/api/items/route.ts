@@ -6,11 +6,16 @@ export async function GET(req: Request) {
   const { searchParams } =
     new URL(req.url);
 
-  const search =
+  const category =
+  searchParams.get("category") || "";
+
+    const search =
     searchParams.get("search") || "";
 
   const items = await prisma.item.findMany({
     where: {
+  AND: [
+    {
       OR: [
         {
           title: {
@@ -26,10 +31,20 @@ export async function GET(req: Request) {
         },
       ],
     },
-    include: {
-      owner: true,
-      category: true,
-    },
+
+    category
+      ? {
+          category: {
+            name: category,
+          },
+        }
+      : {},
+  ],
+},
+include: {
+  owner: true,
+  category: true,
+}
   });
 
   return NextResponse.json(items);
