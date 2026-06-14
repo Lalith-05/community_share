@@ -4,21 +4,31 @@ import axios from "axios";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
+
 export default function BrowsePage() {
   const [items, setItems] = useState<any[]>([]);
+  const [search, setSearch] = useState("");
 
   useEffect(() => {
     axios
-      .get("/api/items")
+      .get(`/api/items?search=${search}`)
       .then((res) => setItems(res.data));
-  }, []);
+  }, [search]);
 
   return (
     <main className="p-10">
       <h1 className="text-3xl font-bold mb-6">
         Browse Items
       </h1>
-
+          <input
+  type="text"
+  placeholder="Search items..."
+  value={search}
+  onChange={(e) =>
+    setSearch(e.target.value)
+  }
+  className="w-full border p-3 rounded mb-6"
+/>
       <div className="grid md:grid-cols-2 gap-4">
         {items.map((item) => (
           <Link

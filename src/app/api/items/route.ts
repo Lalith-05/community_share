@@ -2,8 +2,30 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getCurrentUser } from "@/lib/auth";
 
-export async function GET() {
+export async function GET(req: Request) {
+  const { searchParams } =
+    new URL(req.url);
+
+  const search =
+    searchParams.get("search") || "";
+
   const items = await prisma.item.findMany({
+    where: {
+      OR: [
+        {
+          title: {
+            contains: search,
+            mode: "insensitive",
+          },
+        },
+        {
+          description: {
+            contains: search,
+            mode: "insensitive",
+          },
+        },
+      ],
+    },
     include: {
       owner: true,
       category: true,
