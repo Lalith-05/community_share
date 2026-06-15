@@ -16,19 +16,28 @@ const [message, setMessage] = useState("");
 
 const handleBorrow = async () => {
   try {
-    await axios.post("/api/borrow-requests", {
-      itemId: item.id,
-      startDate,
-      endDate,
-      message,
-    });
+    await axios.post(
+      "/api/borrow-requests",
+      {
+        itemId: item.id,
+        startDate,
+        endDate,
+        message,
+      }
+    );
 
     alert("Borrow request sent!");
-  } catch (error) {
+
+  } catch (error: any) {
+
     console.error(error);
-    alert("Failed to send request");
+
+    alert(
+      error.response?.data?.error ||
+      "Failed to send request"
+    );
   }
-}; 
+};
 useEffect(() => {
     if (!id) return;
 

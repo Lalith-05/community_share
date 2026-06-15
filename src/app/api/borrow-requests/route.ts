@@ -41,6 +41,32 @@ if (item.ownerId === currentUser.id) {
     { status: 400 }
   );
 }
+const existingRequest =
+  await prisma.borrowRequest.findFirst({
+    where: {
+      itemId,
+      borrowerId: currentUser.id,
+
+      status: {
+        in: [
+          "PENDING",
+          "APPROVED",
+        ],
+      },
+    },
+  });
+
+if (existingRequest) {
+  return NextResponse.json(
+    {
+      error:
+        "You already have an active request for this item",
+    },
+    {
+      status: 400,
+    }
+  );
+}
     const request = await prisma.borrowRequest.create({
       data: {
         itemId,
