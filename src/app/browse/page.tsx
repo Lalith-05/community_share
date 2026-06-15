@@ -93,6 +93,17 @@ export default function BrowsePage() {
               <p className="text-sm text-gray-500">
                 Owner: {item.owner.name}
               </p>
+              <p
+  className={`mt-2 font-semibold ${
+    item.availability
+      ? "text-green-600"
+      : "text-red-600"
+  }`}
+>
+  {item.availability
+    ? "🟢 Available"
+    : "🔴 Unavailable"}
+</p>
             </div>
           </Link>
         ))}

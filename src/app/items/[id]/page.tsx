@@ -67,6 +67,19 @@ useEffect(() => {
       <p className="mt-2">
         Max Borrow Days: {item.maxBorrowDays}
       </p>
+      <p
+  className={`mt-2 font-bold ${
+    item.availability
+      ? "text-green-600"
+      : "text-red-600"
+  }`}
+>
+  {item.availability
+    ? "🟢 Available"
+    : "🔴 Unavailable"}
+</p>
+      {item.availability && (
+  <div className="mt-8 border-t pt-6">
       <div className="mt-8 border-t pt-6">
   <h2 className="text-2xl font-bold mb-4">
     Request Borrow
@@ -100,6 +113,7 @@ useEffect(() => {
     Send Request
   </button>
 </div>
-    </main>
+</div>)}
+</main>
   );
 }
