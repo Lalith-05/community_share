@@ -24,6 +24,11 @@ export default function NewItemPage() {
 
   const [depositAmount, setDepositAmount] =
     useState("");
+    const [image, setImage] =
+    useState<File | null>(null);
+
+  const [imageUrl, setImageUrl] =
+   useState("");
 
   useEffect(() => {
     axios
@@ -33,14 +38,45 @@ export default function NewItemPage() {
       );
   }, []);
 
+  const uploadImage = async () => {
+
+  if (!image) {
+    return "";
+  }
+
+  const formData =
+    new FormData();
+
+  formData.append(
+    "file",
+    image
+  );
+
+  const response =
+    await axios.post(
+      "/api/upload",
+      formData
+    );
+
+  return response.data.url;
+};
+
   const handleSubmit = async (
     e: React.FormEvent
   ) => {
     e.preventDefault();
 
+    const uploadedUrl =
+  await uploadImage();
+
+setImageUrl(uploadedUrl);
+
     await axios.post("/api/items", {
       title,
       description,
+      imageUrls: uploadedUrl
+  ? [uploadedUrl]
+  : [],
       categoryId,
       maxBorrowDays,
       depositAmount,
@@ -76,6 +112,27 @@ export default function NewItemPage() {
             setDescription(e.target.value)
           }
         />
+
+        <input
+  type="file"
+
+  accept="image/*"
+
+  onChange={(e) =>
+    setImage(
+      e.target.files?.[0]
+      || null
+    )
+  }
+
+  className="
+    w-full
+    border
+    p-3
+    rounded
+    mb-4
+  "
+/>
 
         <select
           className="w-full border p-3 rounded"

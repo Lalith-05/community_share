@@ -66,6 +66,7 @@ export async function POST(req: Request) {
     const {
       title,
       description,
+      imageUrls,
       categoryId,
       maxBorrowDays,
       depositAmount,
@@ -75,6 +76,7 @@ export async function POST(req: Request) {
       data: {
         title,
         description,
+        imageUrls,
         categoryId,
         maxBorrowDays: Number(maxBorrowDays),
         depositAmount:
