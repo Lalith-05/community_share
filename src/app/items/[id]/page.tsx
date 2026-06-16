@@ -13,6 +13,17 @@ export default function ItemDetailsPage() {
   const [startDate, setStartDate] = useState("");
 const [endDate, setEndDate] = useState("");
 const [message, setMessage] = useState("");
+const [reviews,
+setReviews] =
+useState<any[]>([]);
+
+const [rating,
+setRating] =
+useState(5);
+
+const [comment,
+setComment] =
+useState("");
 
 const handleBorrow = async () => {
   try {
@@ -38,6 +49,32 @@ const handleBorrow = async () => {
     );
   }
 };
+
+const handleReview =
+async () => {
+
+  await axios.post(
+    "/api/reviews",
+
+    {
+
+      itemId:
+        item.id,
+
+      rating,
+
+      comment,
+
+    }
+  );
+
+  alert(
+    "Review added!"
+  );
+
+  setComment("");
+};
+
 useEffect(() => {
     if (!id) return;
 
@@ -49,11 +86,16 @@ useEffect(() => {
       .catch((err) => {
         console.error(err);
       });
+
+        axios.get(`/api/reviews?itemId=${id}`)
+      .then((res) => setReviews(res.data));  
+      
   }, [id]);
 
   if (!item) {
     return <div className="p-10">Loading...</div>;
   }
+
 
   return (
     <main className="p-10">
@@ -96,7 +138,6 @@ useEffect(() => {
 </p>
       {item.availability && (
   <div className="mt-8 border-t pt-6">
-      <div className="mt-8 border-t pt-6">
   <h2 className="text-2xl font-bold mb-4">
     Request Borrow
   </h2>
@@ -128,8 +169,163 @@ useEffect(() => {
   >
     Send Request
   </button>
-</div>
+
 </div>)}
+<div className="mt-10">
+
+  <h2 className="
+    text-2xl
+    font-bold
+    mb-4
+  ">
+
+    Reviews
+
+  </h2>
+
+  <select
+
+    value={rating}
+
+    onChange={(e) =>
+      setRating(
+        Number(
+          e.target.value
+        )
+      )
+    }
+
+    className="
+      border
+      p-3
+      rounded
+      mb-4
+      w-full
+    "
+
+  >
+
+    <option value={5}>
+      ⭐⭐⭐⭐⭐
+    </option>
+
+    <option value={4}>
+      ⭐⭐⭐⭐
+    </option>
+
+    <option value={3}>
+      ⭐⭐⭐
+    </option>
+
+    <option value={2}>
+      ⭐⭐
+    </option>
+
+    <option value={1}>
+      ⭐
+    </option>
+
+  </select>
+
+  <textarea
+
+    value={comment}
+
+    onChange={(e) =>
+      setComment(
+        e.target.value
+      )
+    }
+
+    placeholder="Comment"
+
+    className="
+      w-full
+      border
+      p-3
+      rounded
+      mb-4
+    "
+
+  />
+
+  <button
+
+    onClick={
+      handleReview
+    }
+
+    className="
+      bg-black
+      text-white
+      px-4
+      py-2
+      rounded
+      mb-6
+    "
+
+  >
+
+    Submit Review
+
+  </button>
+
+  <div className="space-y-4">
+
+    {reviews.map(
+      (review) => (
+
+      <div
+
+        key={
+          review.id
+        }
+
+        className="
+          border
+          p-4
+          rounded
+        "
+
+      >
+
+        <p>
+
+          {
+            review.rating
+          }
+
+          /5 ⭐
+
+        </p>
+
+        <p>
+
+          {
+            review.comment
+          }
+
+        </p>
+
+        <p className="text-sm text-gray-500">
+
+          By
+
+          {" "}
+
+          {
+            review.reviewer.name
+          }
+
+        </p>
+
+      </div>
+
+    ))}
+
+  </div>
+
+</div>
 </main>
   );
 }

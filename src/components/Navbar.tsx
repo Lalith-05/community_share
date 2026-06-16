@@ -20,6 +20,10 @@ export default function Navbar() {
           Dashboard
         </Link>
 
+        <Link href="/profile">
+          Profile
+        </Link>
+
         <Link href="/browse">
           Browse
         </Link>
