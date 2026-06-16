@@ -60,6 +60,13 @@ useEffect(() => {
       <h1 className="text-4xl font-bold">
         {item.title}
       </h1>
+      {item.imageUrls?.[0] && (
+        <img
+          src={item.imageUrls[0]}
+          alt={item.title}
+          className="w-full max-w-lg h-80 object-cover rounded my-6"
+        />
+      )}
 
       <p className="mt-4">
         {item.description}

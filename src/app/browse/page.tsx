@@ -78,6 +78,13 @@ export default function BrowsePage() {
             href={`/items/${item.id}`}
           >
             <div className="border rounded p-4 hover:shadow cursor-pointer">
+              {item.imageUrls?.[0] && (
+                <img
+                  src={item.imageUrls[0]}
+                  alt={item.title}
+                  className="w-full h-48 object-cover rounded mb-4"
+                />
+              )}
               <h2 className="text-xl font-bold">
                 {item.title}
               </h2>

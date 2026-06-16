@@ -24,6 +24,13 @@ export default function MyItemsPage() {
             key={item.id}
             className="border p-4 rounded"
           >
+            {item.imageUrls?.[0] && (
+              <img
+                src={item.imageUrls[0]}
+                alt={item.title}
+                className="w-full h-40 object-cover rounded mb-4"
+              />
+            )}
             <h2 className="font-bold text-xl">
               {item.title}
             </h2>
