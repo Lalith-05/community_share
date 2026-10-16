@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { getCurrentUser } from "@/lib/auth";
 import { NextResponse } from "next/server";
 
 export async function PATCH(
@@ -6,12 +7,33 @@ export async function PATCH(
   context: { params: Promise<{ id: string }> }
 ) {
   try {
+    // 1. Verify authentication
+    const currentUser = await getCurrentUser();
+
+    if (!currentUser) {
+      return NextResponse.json(
+        { error: "Unauthorized. Please log in." },
+        { status: 401 }
+      );
+    }
+
+    // 2. Get the borrowing request ID
     const { id } = await context.params;
 
-    const body = await request.json();
+    // 3. Validate the requested status
+    let body: { status?: unknown };
+
+    try {
+      body = await request.json();
+    } catch {
+      return NextResponse.json(
+        { error: "Invalid JSON request body" },
+        { status: 400 }
+      );
+    }
+
     const { status } = body;
 
-    // Only allow valid status changes
     if (status !== "APPROVED" && status !== "REJECTED") {
       return NextResponse.json(
         { error: "Invalid status" },
@@ -19,11 +41,9 @@ export async function PATCH(
       );
     }
 
-    // Get the request being updated
+    // 4. Retrieve the borrowing request and its item
     const borrowRequest = await prisma.borrowRequest.findUnique({
-      where: {
-        id,
-      },
+      where: { id },
       include: {
         item: true,
       },
@@ -36,29 +56,35 @@ export async function PATCH(
       );
     }
 
-    // If approving, check whether the requested dates
-    // overlap with another approved booking.
+    // 5. Only the item owner can approve or reject
+    if (borrowRequest.item.ownerId !== currentUser.id) {
+      return NextResponse.json(
+        { error: "You are not authorized to manage this request" },
+        { status: 403 }
+      );
+    }
+
+    // 6. Only pending requests can be processed
+    if (borrowRequest.status !== "PENDING") {
+      return NextResponse.json(
+        { error: "This request has already been processed" },
+        { status: 409 }
+      );
+    }
+
+    // 7. Prevent overlapping approved bookings
     if (status === "APPROVED") {
       const overlappingRequest =
         await prisma.borrowRequest.findFirst({
           where: {
             itemId: borrowRequest.itemId,
-
             status: "APPROVED",
-
-            // Ignore the current request
             id: {
               not: id,
             },
-
-            // Overlap condition:
-            // existing.start < requested.end
-            // AND
-            // existing.end > requested.start
             startDate: {
               lt: borrowRequest.endDate,
             },
-
             endDate: {
               gt: borrowRequest.startDate,
             },
@@ -76,20 +102,14 @@ export async function PATCH(
       }
     }
 
-    // Update only the borrow request.
-    // We DO NOT change item.availability here.
-    const updatedRequest =
-      await prisma.borrowRequest.update({
-        where: {
-          id,
-        },
-        data: {
-          status,
-        },
-        include: {
-          item: true,
-        },
-      });
+    // 8. Update the request
+    const updatedRequest = await prisma.borrowRequest.update({
+      where: { id },
+      data: { status },
+      include: {
+        item: true,
+      },
+    });
 
     return NextResponse.json(updatedRequest);
   } catch (error) {
